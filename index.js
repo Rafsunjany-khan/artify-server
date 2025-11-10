@@ -14,13 +14,28 @@ const client = new MongoClient(process.env.MONGO_URI);
 async function run() {
   try {
     await client.connect();
-    const db = client.db("artify-db"); // my database name
-    const collection = db.collection("artify"); // my collection name
+    const db = client.db("artify-db");
+    const bannerCollection = db.collection("artify"); //Banner
+    const artworkCollection = db.collection("artworks"); // artworks
 
-    // get all banners
     app.get("/api/banners", async (req, res) => {
-      const banners = await collection.find().toArray();
+      const banners = await bannerCollection.find().toArray();
       res.json(banners);
+    });
+
+    app.get("/api/artworks", async (req, res) => {
+      try {
+        let limit = parseInt(req.query.limit) || 0; // return all data
+        const artworks = await artworkCollection
+          .find()
+          .sort({ createdAt: -1 })
+          .limit(limit)
+          .toArray();
+        res.json(artworks);
+      } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Failed to fetch artworks" });
+      }
     });
 
     app.listen(port, () => {
