@@ -46,4 +46,19 @@ router.post("/", async (req, res) => {
   }
 });
 
+// ArtworkDetails page
+router.get("/:id", async (req, res) => {
+  try {
+    const artwork = await Artwork.findById(req.params.id);
+    if (!artwork) {
+      return res.status(404).json({ message: "Artwork not found" });
+    }
+    res.json(artwork);
+  } catch (err) {
+    console.error("GET /:id Error:", err);
+    res.status(500).json({ message: "Failed to fetch artwork details" });
+  }
+});
+
+
 module.exports = router;
