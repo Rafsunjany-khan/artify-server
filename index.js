@@ -1,49 +1,51 @@
 const express = require("express");
 const cors = require("cors");
-const { MongoClient } = require("mongodb");
+const mongoose = require("mongoose");
 require("dotenv").config();
 
 const app = express();
 const port = process.env.PORT || 5000;
 
+
 app.use(cors());
 app.use(express.json());
 
-const client = new MongoClient(process.env.MONGO_URI);
 
-async function run() {
+const artworkRoutes = require("./routes/artworks");
+app.use("/api/artworks", artworkRoutes);
+
+
+app.get("/api/banners", async (req, res) => {
   try {
-    await client.connect();
-    const db = client.db("artify-db");
-    const bannerCollection = db.collection("artify"); //Banner
-    const artworkCollection = db.collection("artworks"); // artworks
+    const Banner = mongoose.connection.db.collection("artify");
+    const banners = await Banner.find().toArray();
+    res.json(banners);
+  } catch (err) {
+    console.error("Failed to fetch banners:", err);
+    res.status(500).json({ message: "Failed to fetch banners" });
+  }
+});
 
-    app.get("/api/banners", async (req, res) => {
-      const banners = await bannerCollection.find().toArray();
-      res.json(banners);
-    });
 
-    app.get("/api/artworks", async (req, res) => {
-      try {
-        let limit = parseInt(req.query.limit) || 0; // return all data
-        const artworks = await artworkCollection
-          .find()
-          .sort({ createdAt: -1 })
-          .limit(limit)
-          .toArray();
-        res.json(artworks);
-      } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: "Failed to fetch artworks" });
-      }
-    });
-
-    app.listen(port, () => {
-      console.log(`Server running on port ${port}`);
-    });
+app.get("/api/all-artworks", async (req, res) => {
+  try {
+    const Artwork = mongoose.model("Artworks");
+    let limit = parseInt(req.query.limit) || 0;
+    const artworks = await Artwork.find().sort({ createdAt: -1 }).limit(limit);
+    res.json(artworks);
   } catch (err) {
     console.error(err);
+    res.status(500).json({ message: "Failed to fetch artworks" });
   }
-}
+});
 
-run();
+// Mongoose Connection
+mongoose
+  .connect(process.env.MONGO_URI, { dbName: "artify-db" })
+  .then(() => console.log("MongoDB connected via Mongoose"))
+  .catch((err) => console.error("MongoDB connection error:", err));
+
+// Start server
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
