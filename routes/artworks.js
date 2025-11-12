@@ -60,5 +60,59 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+// Update artwork by ID
+// Update artwork by ID
+router.put("/:id", async (req, res) => {
+  try {
+    const {
+      title,
+      artist,
+      category,
+      image,
+      description,
+      medium,
+      dimensions,
+      price,
+      visibility,
+      userName,
+      userEmail,
+    } = req.body;
+
+    // Build the update object
+    const updateData = {
+      title,
+      artist,
+      category,
+      image,
+      description,
+      medium,
+      dimensions,
+      price,
+      visibility,
+      userName,
+      userEmail,
+    };
+
+    // Remove undefined fields (if not provided in req.body)
+    Object.keys(updateData).forEach(
+      (key) => updateData[key] === undefined && delete updateData[key]
+    );
+
+    const updatedArtwork = await Artwork.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedArtwork) {
+      return res.status(404).json({ message: "Artwork not found" });
+    }
+
+    res.json({ message: "Artwork updated successfully!", artwork: updatedArtwork });
+  } catch (err) {
+    console.error("PUT /:id Error:", err);
+    res.status(500).json({ message: "Failed to update artwork" });
+  }
+});
 
 module.exports = router;

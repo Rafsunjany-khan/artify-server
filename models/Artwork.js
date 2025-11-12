@@ -7,6 +7,13 @@ const artworkSchema = new mongoose.Schema(
     category: { type: String, required: true },
     image: { type: String, required: true },
     description: { type: String },
+    medium: { type: String },
+    dimensions: { type: String },
+    year: { type: Number },
+    price: { type: Number },
+    visibility: { type: String },
+    userName: { type: String },
+    userEmail: { type: String },
   },
   { timestamps: true }
 );
