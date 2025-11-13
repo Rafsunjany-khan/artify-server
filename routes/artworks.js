@@ -5,9 +5,17 @@ const Artwork = require("../models/Artwork");
 
 router.get("/", async (req, res) => {
   try {
-    let limit = parseInt(req.query.limit) || 0;
+    const { email, limit: queryLimit } = req.query;
+    const limit = parseInt(queryLimit) || 0;
+    let filter = {};
 
-    const artworks = await Artwork.find()
+    if (email) {
+      filter.userEmail = email;
+    } else {
+      filter.visibility = "Public";
+    }
+
+    const artworks = await Artwork.find(filter)
       .sort({ createdAt: -1 })
       .limit(limit);
 
@@ -17,6 +25,7 @@ router.get("/", async (req, res) => {
     res.status(500).json({ message: "Failed to fetch artworks" });
   }
 });
+
 
 router.post("/", async (req, res) => {
   try {
