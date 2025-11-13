@@ -3,6 +3,9 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 require("dotenv").config();
 
+const Artwork = require("./models/Artwork");
+const User = require("./models/User");
+
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -10,6 +13,8 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+const userRoutes = require("./routes/users");
+app.use("/api/users", userRoutes);
 
 const artworkRoutes = require("./routes/artworks");
 app.use("/api/artworks", artworkRoutes);
