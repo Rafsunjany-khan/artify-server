@@ -14,6 +14,16 @@ const artworkSchema = new mongoose.Schema(
     visibility: { type: String },
     userName: { type: String },
     userEmail: { type: String },
+
+    likes: {
+      type: [String],
+      default: []
+    },
+
+    favorites: {
+      type: [String],
+      default: []
+    }
   },
   { timestamps: true }
 );

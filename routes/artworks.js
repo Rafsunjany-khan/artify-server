@@ -72,12 +72,10 @@ router.put("/:id", async (req, res) => {
     title, artist, category, image, description, medium, dimensions, price, visibility, userName, userEmail,
     } = req.body;
 
-    // Build the update object
     const updateData = {
       title, artist, category, image, description, medium, dimensions, price, visibility, userName, userEmail,
     };
 
-    // Remove undefined fields
     Object.keys(updateData).forEach(
       (key) => updateData[key] === undefined && delete updateData[key]
     );
@@ -112,6 +110,48 @@ router.delete("/:id", async (req, res) => {
   } catch (err) {
     console.error("DELETE /:id Error:", err);
     res.status(500).json({ message: "Failed to delete artwork" });
+  }
+});
+
+// Like artwork
+router.put("/:id/like", async (req, res) => {
+  try {
+    const { userEmail } = req.body;
+    if (!userEmail) return res.status(400).json({ message: "User email required" });
+
+    const artwork = await Artwork.findById(req.params.id);
+    if (!artwork) return res.status(404).json({ message: "Artwork not found" });
+
+    if (!artwork.likes.includes(userEmail)) {
+      artwork.likes.push(userEmail);
+      await artwork.save();
+    }
+
+    res.json(artwork);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to like artwork" });
+  }
+});
+
+// Add to favorites
+router.put("/:id/favorite", async (req, res) => {
+  try {
+    const { userEmail } = req.body;
+    if (!userEmail) return res.status(400).json({ message: "User email required" });
+
+    const artwork = await Artwork.findById(req.params.id);
+    if (!artwork) return res.status(404).json({ message: "Artwork not found" });
+
+    if (!artwork.favorites.includes(userEmail)) {
+      artwork.favorites.push(userEmail);
+      await artwork.save();
+    }
+
+    res.json(artwork);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to add to favorites" });
   }
 });
 
