@@ -134,25 +134,31 @@ router.put("/:id/like", async (req, res) => {
   }
 });
 
-// Add to favorites
+// Toggle favorite
 router.put("/:id/favorite", async (req, res) => {
   try {
     const { userEmail } = req.body;
-    if (!userEmail) return res.status(400).json({ message: "User email required" });
-
     const artwork = await Artwork.findById(req.params.id);
-    if (!artwork) return res.status(404).json({ message: "Artwork not found" });
 
-    if (!artwork.favorites.includes(userEmail)) {
-      artwork.favorites.push(userEmail);
-      await artwork.save();
+    if (!artwork) {
+      return res.status(404).json({ message: "Artwork not found" });
     }
+
+    const index = artwork.favorites.indexOf(userEmail);
+    if (index === -1) {
+      artwork.favorites.push(userEmail);
+    } else {
+      artwork.favorites.splice(index, 1);
+    }
+
+    await artwork.save();
 
     res.json(artwork);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Failed to add to favorites" });
+    res.status(500).json({ message: "Failed to update favorite" });
   }
 });
+
 
 module.exports = router;
