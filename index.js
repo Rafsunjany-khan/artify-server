@@ -19,6 +19,9 @@ app.use("/api/users", userRoutes);
 const artworkRoutes = require("./routes/artworks");
 app.use("/api/artworks", artworkRoutes);
 
+const statsRoutes = require("./routes/stats");
+app.use("/api/stats", statsRoutes);
+
 
 app.get("/api/banners", async (req, res) => {
   try {
@@ -54,3 +57,14 @@ mongoose
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
+
+const path = require("path");
+
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../client/build")));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../client/build", "index.html"));
+  });
+}
