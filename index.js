@@ -7,12 +7,12 @@ const Artwork = require("./models/Artwork");
 const User = require("./models/User");
 
 const app = express();
-const port = process.env.PORT || 5000;
 
-
+// Middleware
 app.use(cors());
 app.use(express.json());
 
+// Routes
 const userRoutes = require("./routes/users");
 app.use("/api/users", userRoutes);
 
@@ -22,7 +22,7 @@ app.use("/api/artworks", artworkRoutes);
 const statsRoutes = require("./routes/stats");
 app.use("/api/stats", statsRoutes);
 
-
+// Banners API
 app.get("/api/banners", async (req, res) => {
   try {
     const Banner = mongoose.connection.db.collection("artify");
@@ -34,7 +34,7 @@ app.get("/api/banners", async (req, res) => {
   }
 });
 
-
+// All artworks API
 app.get("/api/all-artworks", async (req, res) => {
   try {
     const Artwork = mongoose.model("Artworks");
@@ -47,24 +47,11 @@ app.get("/api/all-artworks", async (req, res) => {
   }
 });
 
-// Mongoose Connection
+// MongoDB Connection
 mongoose
   .connect(process.env.MONGO_URI, { dbName: "artify-db" })
   .then(() => console.log("MongoDB connected via Mongoose"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-// Start server
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
-
-const path = require("path");
-
-
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../client/build")));
-
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../client/build", "index.html"));
-  });
-}
+// Export app for Vercel
+module.exports = app;
