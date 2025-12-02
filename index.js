@@ -37,7 +37,6 @@ app.get("/api/banners", async (req, res) => {
 // All artworks API
 app.get("/api/all-artworks", async (req, res) => {
   try {
-    const Artwork = mongoose.model("Artworks");
     let limit = parseInt(req.query.limit) || 0;
     const artworks = await Artwork.find().sort({ createdAt: -1 }).limit(limit);
     res.json(artworks);
@@ -50,8 +49,9 @@ app.get("/api/all-artworks", async (req, res) => {
 // MongoDB Connection
 mongoose
   .connect(process.env.MONGO_URI, { dbName: "artify-db" })
-  .then(() => console.log("MongoDB connected via Mongoose"))
+  .then(() => {
+    console.log("MongoDB connected via Mongoose");
+  })
   .catch((err) => console.error("MongoDB connection error:", err));
 
-// Export app for Vercel
-module.exports = app;
+module.exports = app; // optional for testing, serverless, etc.
