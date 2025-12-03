@@ -8,11 +8,13 @@ const User = require("./models/User");
 
 const app = express();
 
-// Middleware
-app.use(cors());
+// Enable CORS for all origins
+app.use(cors({ origin: "*" }));
+
+// Parse JSON bodies
 app.use(express.json());
 
-// Routes
+//Routes
 const userRoutes = require("./routes/users");
 app.use("/api/users", userRoutes);
 
@@ -46,7 +48,7 @@ app.get("/api/all-artworks", async (req, res) => {
   }
 });
 
-// MongoDB Connection
+//MongoDB Connection
 mongoose
   .connect(process.env.MONGO_URI, { dbName: "artify-db" })
   .then(() => {
@@ -58,6 +60,5 @@ const port = process.env.PORT || 5000;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
-
 
 module.exports = app;

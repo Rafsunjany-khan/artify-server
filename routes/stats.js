@@ -7,13 +7,14 @@ const User = require("../models/User");
 router.get("/", async (req, res) => {
   try {
     const totalArtworks = await Artwork.countDocuments();
-    const totalMembers = await User.countDocuments();
 
     const allArtworks = await Artwork.find({}, "likes");
     const totalLikes = allArtworks.reduce(
       (sum, art) => sum + (art.likes?.length || 0),
       0
     );
+
+    const totalMembers = await User.countDocuments();
 
     res.json({
       totalArtworks,
